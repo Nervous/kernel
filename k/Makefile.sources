@@ -1,0 +1,2 @@
+SRC	= main.c console.c
+ASM	= crt0.S
