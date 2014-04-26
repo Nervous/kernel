@@ -24,22 +24,20 @@
 #include "multiboot.h"
 #include "kstd.h"
 #include "stdio.h"
+
 #include "console.h"
+#include "serial.h"
 
 void	k_main(unsigned long		magic,
 	       multiboot_info_t*	info)
 {
-  (void) magic;
-  (void) info;
-
-  {
-    printf("%c%cCOUCOU!%c%c%cCECI EST MOCHE", CONS_ESCAPE, CONS_CLEAR,
-           CONS_ESCAPE, CONS_COLOR,
-           CONS_FRONT(CONS_YELLOW) | CONS_BACK(CONS_MAGENTA));
-
-    while (1)
-        ;
-  }
+    (void) magic;
+    (void) info;
+    {
+        init_uart();
+        while(1)
+            ;
+    }
 
   return;
 }
