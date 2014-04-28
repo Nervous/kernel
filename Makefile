@@ -71,7 +71,7 @@ boot: floppy
 	$(QEMU) -fda $(FLOPPY) -soundhw all &
 .PHONY: boot
 
-bootserial: floppy
+serialboot: floppy
 	$(QEMU) -fda $(FLOPPY) -soundhw all -serial pty &
 .PHONY: bootserial
 

@@ -37,10 +37,13 @@ static char cons_putc(const char c)
 {
     char* buf = (void*) BUFFER_START;
     if (c == '\n')
+    {
         ++cons.line;
+        cons.column = 0;
+    }
     else if (c == '\t')
     {
-        cons.column = cons.column < 71 ? cons.column + 1 : 0;
+        cons.column = cons.column < 71 ? cons.column + 8 : 0;
         if (cons.column == 0)
             ++(cons.line);
     }
