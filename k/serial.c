@@ -20,16 +20,16 @@ static void init_uart_port(t_uint16 port)
     outb(port + 1, 0x0); // Disable interrupts
     outb(port + 3, 0x80); // Set DLAB = 1
     outb(port + 0, 0x03); // low divisor = 3 (baudrate 38400)
-    outb(port + 1, 0x03); // high divisor = 0
+    outb(port + 1, 0x00); // high divisor = 0
     outb(port + 3, 0x03); // 8N1
 }
 
 void init_uart()
 {
     init_uart_port(0x3F8); // COM1
-    init_uart_port(0x2F8); // COM2
-    init_uart_port(0x3E8); // COM3
-    init_uart_port(0x2E8); // COM4
+    //init_uart_port(0x2F8); // COM2
+    //init_uart_port(0x3E8); // COM3
+    //init_uart_port(0x2E8); // COM4
 }
 
 int send(int port, void* data, unsigned int len)
