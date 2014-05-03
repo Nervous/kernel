@@ -32,10 +32,11 @@ void	k_main(unsigned long		magic,
     (void) info;
     {
         init_uart();
-        char str[] = "CACA!\r\n";
+        printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
+        char str[] = "Hello world!\n";
         while(1)
         {
-            send(0x03f8, str, 8);
+            printf("%s", str);
         }
     }
 

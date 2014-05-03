@@ -1,5 +1,7 @@
-#include "kstd.h"
 #include "console.h"
+
+#include "kstd.h"
+#include "serial.h"
 
 #define BUFFER_START    0xB8000
 #define BUFFER_END      0xBFD00 // 0xB8000 + 25 rows * 80 columns * 16 bits
@@ -10,7 +12,7 @@ s_cons_attrs cons =
     0,
     0x0F
 };
-// \n \r \t
+
 static void init_cons(void)
 {
     cons.attrs = 0x0F;
@@ -40,22 +42,28 @@ static char cons_putc(const char c)
     {
         ++cons.line;
         cons.column = 0;
+        send_const(COM1, "\r\n", 2);
     }
-    else if (c == '\t')
-    {
-        cons.column = cons.column < 71 ? cons.column + 8 : 0;
-        if (cons.column == 0)
-            ++(cons.line);
-    }
-    else if (c == '\r')
-        cons.column = 0;
     else
     {
-        buf[(cons.line * 80 + cons.column) * 2] = c;
-        buf[((cons.line * 80 + cons.column) * 2) + 1] = cons.attrs;
-        cons.column = cons.column < 79 ? cons.column + 1 : 0;
-        if (cons.column == 0)
-            ++(cons.line);
+        if (c == '\t')
+        {
+            cons.column = cons.column < 71 ? cons.column + 8 : 0;
+            if (cons.column == 0)
+                ++(cons.line);
+        }
+        else if (c == '\r')
+            cons.column = 0;
+        else
+        {
+            buf[(cons.line * 80 + cons.column) * 2] = c;
+            buf[((cons.line * 80 + cons.column) * 2) + 1] = cons.attrs;
+            cons.column = cons.column < 79 ? cons.column + 1 : 0;
+            if (cons.column == 0)
+                ++(cons.line);
+        }
+
+        send_const(COM1, &c, 1);
     }
 
     return cons.line == 25;
