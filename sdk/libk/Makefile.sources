@@ -1,0 +1,2 @@
+SRC	= graphic.c malloc.c sound.c syscalls.c
+ASM	= int80.S
