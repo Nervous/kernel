@@ -10,3 +10,8 @@ reload_segs:
     mov %ax, %ss
     mov $0x08 /* Second entry of gdt is kernel code, for cs */
     ljmp %ax /* long jump to code */
+
+.global gdt_flush
+gdt_flush:
+    mov 0x4(%esp), %eax
+    lgdt (%eax)

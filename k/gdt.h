@@ -5,6 +5,14 @@
 extern void switch_pe();
 extern void reload_segs();
 
+struct gdt_ptr
+{
+    t_uint16 limit;
+    t_uint32 base;
+} __attribute__((__packed__));
+
+extern void gdt_flush(struct gdt_ptr* gdt_ptr);
+
 struct __attribute__((__packed__)) gdt_entry
 {
   t_uint16 limit_low;
