@@ -10,6 +10,12 @@ void set_entry(t_uint32 base, t_uint32 limit, t_uint8 type, int nb)
   tmp.limit_low = limit;
   tmp.baselow = base & 0xFFFF;
   tmp.base_mid = (base >> 16) & 0xFF;
+  tmp.g_b = 1;
+  tmp.avl = 1;
+  tmp.db_b = 1;
+  tmp.dpl = 0;
+  tmp.p_b = 1;
+  tmp.s_b = 1;
   tmp.type = type & 0xF;
   tmp.limit_high = (limit >> 16) & 0xF;
   tmp.base_high = (base >> 24) & 0xFF;
@@ -22,7 +28,7 @@ void set_gdt()
   set_entry(0, 0xFFFFFFFF, 0x9A, 1);
   set_entry(0, 0xFFFFFFFF, 0x92, 2);
   gdt_str.base = (t_uint32) gdt;
-  gdt_str.limit = sizeof(s_gdt_entry) * 3;
+  gdt_str.limit = sizeof(s_gdt_entry) * 3 - 1;
   gdt_flush(&gdt_str);
   switch_pe();
   reload_segs();

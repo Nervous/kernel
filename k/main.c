@@ -33,12 +33,9 @@ void	k_main(unsigned long		magic,
     (void) info;
     {
         init_uart();
-        printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
-        char str[] = "Hello world!\n";
         set_gdt();
         while(1)
         {
-            printf("%s", str);
         }
     }
 
