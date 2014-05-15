@@ -24,6 +24,7 @@
 
 #include "console.h"
 #include "serial.h"
+#include "gdt.h"
 
 void	k_main(unsigned long		magic,
 	       multiboot_info_t*	info)
@@ -34,6 +35,7 @@ void	k_main(unsigned long		magic,
         init_uart();
         printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
         char str[] = "Hello world!\n";
+        set_gdt();
         while(1)
         {
             printf("%s", str);

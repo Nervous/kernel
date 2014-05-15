@@ -1,2 +1,2 @@
-SRC	= main.c console.c serial.c
-ASM	= crt0.S gdt.S
+SRC	= main.c console.c serial.c gdt.c
+ASM	= crt0.S gdt_asm.S

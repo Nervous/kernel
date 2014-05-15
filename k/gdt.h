@@ -2,8 +2,9 @@
 # define GDT_H
 # include "kstd.h"
 
-extern void switch_pe();
-extern void reload_segs();
+void switch_pe();
+void reload_segs();
+
 
 struct gdt_ptr
 {
@@ -11,7 +12,7 @@ struct gdt_ptr
     t_uint32 base;
 } __attribute__((__packed__));
 
-extern void gdt_flush(struct gdt_ptr* gdt_ptr);
+void gdt_flush(struct gdt_ptr* gdt_ptr);
 
 struct __attribute__((__packed__)) gdt_entry
 {
@@ -31,5 +32,7 @@ struct __attribute__((__packed__)) gdt_entry
 };
 
 typedef struct gdt_entry s_gdt_entry;
+
+void set_gdt();
 
 #endif /* !GDT_H */

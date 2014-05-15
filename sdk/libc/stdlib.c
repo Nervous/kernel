@@ -23,6 +23,14 @@
 */
 #include <stdlib.h>
 
+
+/* beginfixme Gerond_x */
+void *malloc(size_t size)
+{
+  size = size;
+  return (void*)0x0;
+}
+
 /* forward declaration to avoid recursive inclusion of string.h */
 void*	memset(void* s, int c, size_t n);
 
