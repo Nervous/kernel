@@ -1,6 +1,11 @@
 #include "idt.h"
+#include "idt_func.h"
+#include "kstd.h"
 
-void init_idt_desc(u16 select, u32 offset, u16 type, struct idtdesc *desc)
+struct idtdesc idt[255];
+struct idtr idtr;
+
+static void init_idt_dec(t_uint16 select, t_uint32 offset, t_uint16 type, struct idtdesc *desc)
 {
   desc->offset0_15 = (offset & 0xffff);
   desc->select = select;
@@ -18,19 +23,33 @@ void init_idt(void)
   int i;
 
   /* Initialisation des descripteurs systeme par defaut */
-  for (i = 0; i < IDTSIZE; i++) 
-    init_idt_desc(0x08, (u32) _asm_default_int, INTGATE, &kidt[i]);
+  init_idt_dec(0x08, (t_uint32) handler_0, INT_GATE, &idt[0]);
+  init_idt_dec(0x08, (t_uint32) handler_1, INT_GATE, &idt[1]);
+  init_idt_dec(0x08, (t_uint32) handler_2, INT_GATE, &idt[2]);
+  init_idt_dec(0x08, (t_uint32) handler_3, INT_GATE, &idt[3]);
+  init_idt_dec(0x08, (t_uint32) handler_4, INT_GATE, &idt[4]);
+  init_idt_dec(0x08, (t_uint32) handler_5, INT_GATE, &idt[5]);
+  init_idt_dec(0x08, (t_uint32) handler_6, INT_GATE, &idt[6]);
+  init_idt_dec(0x08, (t_uint32) handler_7, INT_GATE, &idt[7]);
+  init_idt_dec(0x08, (t_uint32) handler_8, INT_GATE, &idt[8]);
+  init_idt_dec(0x08, (t_uint32) handler_9, INT_GATE, &idt[9]);
+  init_idt_dec(0x08, (t_uint32) handler_10, INT_GATE, &idt[10]);
+  init_idt_dec(0x08, (t_uint32) handler_11, INT_GATE, &idt[11]);
+  init_idt_dec(0x08, (t_uint32) handler_12, INT_GATE, &idt[12]);
+  init_idt_dec(0x08, (t_uint32) handler_13, INT_GATE, &idt[13]);
+  init_idt_dec(0x08, (t_uint32) handler_14, INT_GATE, &idt[14]);
+  for (int i = 15; i < 32; ++i)
+    init_idt_dec(0x08, (t_uint32) default_int, INT_GATE, &idt[i]);
 
-  init_idt_desc(0x08, (u32) _asm_irq_0, INTGATE, &kidt[32]);	/* horloge */
-  init_idt_desc(0x08, (u32) _asm_irq_1, INTGATE, &kidt[33]);	/* clavier */
+
+  //init_idt_desc(0x08, (u32) _asm_irq_0, INTGATE, &kidt[32]);	/* horloge */
+  //init_idt_desc(0x08, (u32) _asm_irq_1, INTGATE, &kidt[33]);	/* clavier */
 
   /* Initialisation de la structure pour IDTR */
-  kidtr.limite = IDTSIZE * 8;
-  kidtr.base = IDTBASE;
+  idtr.limite = 255 * 8 - 1;
+  idtr.base = idt;
 
   /* Recopie de la IDT a son adresse */
-  memcpy((char *) kidtr.base, (char *) kidt, kidtr.limite);
-
-  /* Chargement du registre IDTR */
-  asm("lidtl (kidtr)");
+  //memcpy((char *) idtr.base, (char *) idt, kidtr.limite);
+  idt_flush(idtr);
 }

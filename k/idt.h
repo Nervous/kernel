@@ -2,18 +2,20 @@
 # define IDT_HH
     //void flud_idt(STRUCT_IDT_ADDR idt_ptr);
 
+#define INT_GATE 0x8E00
+#define TRAP_GATE 0xEF00
 
 struct idtdesc {
-  u16 offset0_15;
-  u16 select;
-  u16 type;
-  u16 offset16_31;
+  t_uint16 offset0_15;
+  t_uint16 select;
+  t_uint16 type;
+  t_uint16 offset16_31;
 } __attribute__ ((__packed__));
 
 /* Registre IDTR */
 struct idtr {
-  u16 limite;
-  u32 base;
+  t_uint16 limite;
+  t_uint32 base;
 } __attribute__ ((__packed__));
 
 void idt_flush(struct idtr* idt_ptr);
