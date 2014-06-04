@@ -16,4 +16,11 @@ struct idtr {
   u32 base;
 } __attribute__ ((__packed__));
 
+void idt_flush(struct idtr* idt_ptr);
+void put_err_code();
+void int_ret();
+void init_pic();
+void unmask_master(t_uint8 pic);
+void unmask_slave(t_uint8 pic);
+
 #endif/* Descripteur de segment */

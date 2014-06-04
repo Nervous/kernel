@@ -1,23 +1,62 @@
-.global switch_pe
-switch_pe:
-    movl %cr0, %eax
-    or $1, %al
-    movl %eax, %cr0 /* Switching to protected mode */
-    ret
-
-.global reload_segs
-reload_segs:
-    ljmp $0x08, $1f /* long jump to code */
-    ret
-
-1:
-    mov $0x10, %ax /* Third entry of gdt is kernel data */
-    mov %ax, %ds
-    mov %ax, %ss
-    ret
-
-.global gdt_flush
-gdt_flush:
+.global idt_flush
+idt_flush:
     mov 0x4(%esp), %eax
-    lgdt (%eax)
+    lidt (%eax)
+    ret
+
+.global put_err_code
+err_code:
+    push 0
+    ret
+
+.global int_ret
+int_ret:
+    pop %eax // Error code
+    iret
+
+.global init_pic
+init_pic:
+    mov $0x11, %al
+    // ICW1
+    outb %al, $0x20 // Master PIC
+    outb %al, $0xA0 // Slave PIC
+    // ICW2
+    mov $0x40, %al
+    outb %al, $0x21 // Master base offset = 64
+    add $0x10, %al
+    outb %al, $0xA1 // Slave base offset = 80
+    // ICW3
+    mov $0x02, %al
+    outb %al, $0x20 // Slave is on PIN 2
+    outb %al, $0xA0
+    //ICW4
+    mov $0x03, %al
+    outb %al, $0x21
+    outb %al, $0xA1
+    ret
+
+unmask:
+    pop %ecx // IRQ wanted
+    pop %edx // Master or slave
+    mov $1, %bl
+    shl %cl, %bl
+    inb %dx, %al
+    or %bl, %al
+    outb %al, %dx
+    ret
+
+.global unmask_master
+unmask_master:
+    mov 0x4(%esp), %eax // IRQ param
+    push %eax
+    push $0x21
+    call unmask
+    ret
+
+.global unmask_slave
+unmask_slave:
+    mov 0x4(%esp), %eax
+    push %eax
+    push $0xA1
+    call unmask
     ret
