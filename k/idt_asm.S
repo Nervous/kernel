@@ -5,13 +5,13 @@ idt_flush:
     ret
 
 .global put_err_code
-err_code:
-    push 0
+put_err_code:
+    //push 0
     ret
 
 .global int_ret
 int_ret:
-    pop %eax // Error code
+    //pop %eax // Error code
     iret
 
 .global init_pic

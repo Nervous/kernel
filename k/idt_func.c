@@ -1,4 +1,5 @@
 #include "kstd.h"
+#include "idt.h"
 #include "stdio.h"
 
 void default_int(void)

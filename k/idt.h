@@ -2,8 +2,10 @@
 # define IDT_HH
     //void flud_idt(STRUCT_IDT_ADDR idt_ptr);
 
-#define INT_GATE 0x8E00
-#define TRAP_GATE 0xEF00
+# define INT_GATE 0x8E00
+# define TRAP_GATE 0xEF00
+
+# include "kstd.h"
 
 struct idtdesc {
   t_uint16 offset0_15;
@@ -18,6 +20,7 @@ struct idtr {
   t_uint32 base;
 } __attribute__ ((__packed__));
 
+void init_idt();
 void idt_flush(struct idtr* idt_ptr);
 void put_err_code();
 void int_ret();

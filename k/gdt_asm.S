@@ -9,11 +9,13 @@ switch_pe:
 reload_segs:
     ljmp $0x08, $1f /* long jump to code */
     ret
+
 1:
     mov $0x10, %ax /* Third entry of gdt is kernel data */
     mov %ax, %ds
     mov %ax, %ss
     ret
+
 .global gdt_flush
 gdt_flush:
     mov 0x4(%esp), %eax

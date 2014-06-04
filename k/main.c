@@ -21,6 +21,7 @@
 #include "multiboot.h"
 #include "kstd.h"
 #include "stdio.h"
+#include "idt.h"
 
 #include "console.h"
 #include "serial.h"
@@ -32,10 +33,14 @@ void	k_main(unsigned long		magic,
     (void) magic;
     (void) info;
     {
-        init_uart();
         set_gdt();
+        init_uart();
+        init_idt();
+        int z = 0;
         while(1)
         {
+            int b = 3 / z;
+            --b;
         }
     }
 

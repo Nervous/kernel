@@ -1,6 +1,5 @@
 #include "idt.h"
 #include "idt_func.h"
-#include "kstd.h"
 
 struct idtdesc idt[255];
 struct idtr idtr;
@@ -20,7 +19,6 @@ static void init_idt_dec(t_uint16 select, t_uint32 offset, t_uint16 type, struct
  */
 void init_idt(void)
 {
-  int i;
 
   /* Initialisation des descripteurs systeme par defaut */
   init_idt_dec(0x08, (t_uint32) handler_0, INT_GATE, &idt[0]);
@@ -47,9 +45,9 @@ void init_idt(void)
 
   /* Initialisation de la structure pour IDTR */
   idtr.limite = 255 * 8 - 1;
-  idtr.base = idt;
+  idtr.base = (t_uint32) idt;
 
   /* Recopie de la IDT a son adresse */
   //memcpy((char *) idtr.base, (char *) idt, kidtr.limite);
-  idt_flush(idtr);
+  idt_flush(&idtr);
 }
