@@ -66,3 +66,14 @@ init_pit:
     mov $0x00, %ah
     outb %al, $0x43 // Mode 2. Counter 0
     outb %al, 0x40 // Set desired frequency on counter 0
+    ret
+
+.global send_EOI_master
+send_EOI_master:
+    mov $0x20, %al
+    outb %al, $0x20
+
+.global send_EOI_slave
+send_EOI_slave:
+    mov $0x20, %al
+    outb %al, $0xA0
