@@ -14,6 +14,11 @@ int_ret:
     //pop %eax // Error code
     iret
 
+.global get_err_code
+get_err_code:
+    pop %eax
+    ret
+
 .global init_pic
 init_pic:
     mov $0x11, %al

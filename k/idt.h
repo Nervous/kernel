@@ -27,5 +27,6 @@ void int_ret();
 void init_pic();
 void unmask_master(t_uint8 pic);
 void unmask_slave(t_uint8 pic);
+int get_err_code();
 
 #endif/* Descripteur de segment */
