@@ -27,6 +27,8 @@
 #include "serial.h"
 #include "gdt.h"
 
+#include "timer.h"
+
 void	k_main(unsigned long		magic,
 	       multiboot_info_t*	info)
 {
@@ -36,11 +38,9 @@ void	k_main(unsigned long		magic,
         set_gdt();
         init_uart();
         init_idt();
-        int z = 0;
         while(1)
         {
-            int b = 3 / z;
-            --b;
+            printf("%d", gettick());
         }
     }
 

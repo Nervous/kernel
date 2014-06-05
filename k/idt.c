@@ -41,7 +41,8 @@ void init_idt(void)
 
 
   init_pic();
-//  init_idt_desc(0x08, (t_uint32) , INTGATE, &kidt[64]);	/* horloge */
+    init_idt_dec(0x08, (t_uint32) handler_timer, INT_GATE, &idt[64]); /* horloge */
+    unmask_master(1);
 //  init_idt_desc(0x08, (t_uint32) , INTGATE, &kidt[65]);	/* clavier */
 
   idtr.limite = 255 * 8 - 1;

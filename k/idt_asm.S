@@ -65,4 +65,4 @@ init_pit:
     mov $0x04, %al
     mov $0x00, %ah
     outb %al, $0x43 // Mode 2. Counter 0
-    outb %al, 0x40 // Set desired frequency on counter 0
+    outb %al, $0x40 // Set desired frequency on counter 0

@@ -1,2 +1,2 @@
-SRC	= main.c console.c serial.c gdt.c idt.c idt_func.c
+SRC	= main.c console.c serial.c gdt.c idt.c idt_func.c timer.c
 ASM	= crt0.S gdt_asm.S idt_asm.S

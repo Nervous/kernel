@@ -1,6 +1,7 @@
 #include "kstd.h"
 #include "idt.h"
 #include "stdio.h"
+#include "timer.h"
 
 void default_int(void)
 {
@@ -113,4 +114,11 @@ void handler_14(void)
   printf("%s", "PageFault\r\n");
   while(1)
     ;
+}
+
+void handler_timer(void)
+{
+    tick();
+    printf("x");
+    int_ret();
 }

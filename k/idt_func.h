@@ -17,4 +17,6 @@ void handler_11(void);
 void handler_12(void);
 void handler_13(void);
 void handler_14(void);
+void handler_timer(void);
+
 #endif
