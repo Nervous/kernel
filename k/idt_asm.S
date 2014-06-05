@@ -38,8 +38,8 @@ unmask:
     pop %ecx // IRQ wanted
     pop %edx // Master or slave
     mov $1, %bl
-    shl %cl, %bl
-    inb %dx, %al
+    shl %cl, %bl // put desired bit on the correct pin
+    inb %dx, %al // read actual setup of pins to not override them
     or %bl, %al
     outb %al, %dx
     ret
@@ -59,3 +59,10 @@ unmask_slave:
     push $0xA1
     call unmask
     ret
+
+.global init_pit
+init_pit:
+    mov $0x04, %al
+    mov $0x00, %ah
+    outb %al, $0x43 // Mode 2. Counter 0
+    outb %al, 0x40 // Set desired frequency on counter 0
