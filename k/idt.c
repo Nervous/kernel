@@ -37,8 +37,6 @@ void init_idt(void)
   init_idt_dec(0x08, (t_uint32) handler_12, INT_GATE, &idt[12]);
   init_idt_dec(0x08, (t_uint32) handler_13, INT_GATE, &idt[13]);
   init_idt_dec(0x08, (t_uint32) handler_14, INT_GATE, &idt[14]);
-  for (int i = 15; i < 32; ++i)
-    init_idt_dec(0x08, (t_uint32) default_int, INT_GATE, &idt[i]);
 
 
     init_idt_dec(0x08, (t_uint32) isr_keyboard, INT_GATE, &idt[64]); /* horloge */
