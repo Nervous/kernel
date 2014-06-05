@@ -97,6 +97,8 @@ void handler_12(void)
 void handler_13(void)
 {
     printf("%s", "General Protection");
+    printf("%d", get_err_code());
+    put_err_code();
     int_ret();
 }
 
