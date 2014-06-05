@@ -40,14 +40,11 @@ void init_idt(void)
     init_idt_dec(0x08, (t_uint32) default_int, INT_GATE, &idt[i]);
 
 
-  //init_idt_desc(0x08, (u32) _asm_irq_0, INTGATE, &kidt[32]);	/* horloge */
-  //init_idt_desc(0x08, (u32) _asm_irq_1, INTGATE, &kidt[33]);	/* clavier */
+  init_pic();
+//  init_idt_desc(0x08, (t_uint32) , INTGATE, &kidt[64]);	/* horloge */
+//  init_idt_desc(0x08, (t_uint32) , INTGATE, &kidt[65]);	/* clavier */
 
-  /* Initialisation de la structure pour IDTR */
   idtr.limite = 255 * 8 - 1;
   idtr.base = (t_uint32) idt;
-
-  /* Recopie de la IDT a son adresse */
-  //memcpy((char *) idtr.base, (char *) idt, kidtr.limite);
   idt_flush(&idtr);
 }
