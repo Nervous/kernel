@@ -34,7 +34,13 @@ init_pic:
     outb %al, $0xA1
     ret
 
-unmask:
+.global unmask_master
+unmask_master:
+    mov 0x4(%esp), %eax // IRQ param
+
+    push %eax
+    push $0x21
+
     pop %ecx // IRQ wanted
     pop %edx // Master or slave
     mov $1, %bl
@@ -42,14 +48,8 @@ unmask:
     inb %dx, %al // read actual setup of pins to not override them
     or %bl, %al
     outb %al, %dx
-    ret
 
-.global unmask_master
-unmask_master:
-    mov 0x4(%esp), %eax // IRQ param
-    push %eax
-    push $0x21
-    call unmask
+    //call unmask
     ret
 
 .global unmask_slave
@@ -57,7 +57,17 @@ unmask_slave:
     mov 0x4(%esp), %eax
     push %eax
     push $0xA1
-    call unmask
+
+    pop %ecx // IRQ wanted
+    pop %edx // Master or slave
+
+    mov $1, %bl
+    shl %cl, %bl // put desired bit on the correct pin
+    inb %dx, %al // read actual setup of pins to not override them
+    or %bl, %al
+    outb %al, %dx
+
+    //call unmask
     ret
 
 .global init_pit
@@ -66,3 +76,16 @@ init_pit:
     mov $0x00, %ah
     outb %al, $0x43 // Mode 2. Counter 0
     outb %al, $0x40 // Set desired frequency on counter 0
+    ret
+
+.global send_EOI_master
+send_EOI_master:
+    mov $0x20, %al
+    outb %al, $0x20
+    ret
+
+.global send_EOI_slave
+send_EOI_slave:
+    mov $0x20, %al
+    outb %al, $0xA0
+    ret

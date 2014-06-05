@@ -120,5 +120,6 @@ void handler_timer(void)
 {
     tick();
     printf("x");
+    send_EOI_master();
     int_ret();
 }

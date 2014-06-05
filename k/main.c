@@ -40,7 +40,8 @@ void	k_main(unsigned long		magic,
         init_idt();
         while(1)
         {
-            printf("%d", gettick());
+            //printf("%d", gettick());
+            printf("2\r\n");
         }
     }
 
