@@ -1,17 +1,23 @@
 .global idt_flush
 idt_flush:
     mov 0x4(%esp), %eax
+    sti
     lidt (%eax)
     ret
 
-.global int_ret
-int_ret:
+isr:
+    pop %eax
+    pusha
+    call *%eax
+    mov $0x20, %al
+    outb %al, $0x20
+    popa
     iret
 
-.global int_ret_err
-int_ret_err:
-    pop %eax // Error code
-    iret
+.global isr_keyboard
+isr_keyboard:
+    pushl $handler_timer
+    jmp isr
 
 .global init_pic
 init_pic:
@@ -25,9 +31,10 @@ init_pic:
     add $0x10, %al
     outb %al, $0xA1 // Slave base offset = 80
     // ICW3
+    mov $0x04, %al
+    outb %al, $0x21 // Slave is on PIN 2
     mov $0x02, %al
-    outb %al, $0x20 // Slave is on PIN 2
-    outb %al, $0xA0
+    outb %al, $0xA1
     //ICW4
     mov $0x03, %al
     outb %al, $0x21
@@ -36,18 +43,14 @@ init_pic:
 
 .global unmask_master
 unmask_master:
-    mov 0x4(%esp), %eax // IRQ param
+    mov 0x4(%esp), %ecx // IRQ param
 
-    push %eax
-    push $0x21
-
-    pop %ecx // IRQ wanted
-    pop %edx // Master or slave
     mov $1, %bl
     shl %cl, %bl // put desired bit on the correct pin
-    inb %dx, %al // read actual setup of pins to not override them
-    or %bl, %al
-    outb %al, %dx
+    not %bl
+    inb $0x21, %al // read actual setup of pins to not override them
+    and %bl, %al
+    outb %al, $0x21
 
     //call unmask
     ret
@@ -80,8 +83,6 @@ init_pit:
 
 .global send_EOI_master
 send_EOI_master:
-    mov $0x20, %al
-    outb %al, $0x20
     ret
 
 .global send_EOI_slave
@@ -89,3 +90,8 @@ send_EOI_slave:
     mov $0x20, %al
     outb %al, $0xA0
     ret
+
+.global mask_all_IRQ
+mask_all_IRQ:
+    mov $0xFF, %al
+    outb %al, $0x21

@@ -26,13 +26,11 @@ struct idtr {
 
 void init_idt();
 void idt_flush(struct idtr* idt_ptr);
-void put_err_code();
-void int_ret();
-void int_ret_err();
 void init_pic();
-void pop_err_code();
+void init_pit();
 void unmask_master(t_uint8 pic);
 void unmask_slave(t_uint8 pic);
-void send_EOI_master();
+void isr_keyboard();
+void mask_all_IRQ();
 
 #endif/* Descripteur de segment */

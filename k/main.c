@@ -38,10 +38,10 @@ void	k_main(unsigned long		magic,
         set_gdt();
         init_uart();
         init_idt();
+        printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
         while(1)
         {
-            //printf("%d", gettick());
-            printf("2\r\n");
+            printf("%d\r", gettick());
         }
     }
 

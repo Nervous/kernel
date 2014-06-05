@@ -4,6 +4,8 @@
 struct idtdesc idt[255];
 struct idtr idtr;
 
+void unmask_PIT();
+
 static void init_idt_dec(t_uint16 select, t_uint32 offset, t_uint16 type, struct idtdesc *desc)
 {
   desc->offset0_15 = (offset & 0xffff);
@@ -19,7 +21,6 @@ static void init_idt_dec(t_uint16 select, t_uint32 offset, t_uint16 type, struct
  */
 void init_idt(void)
 {
-
   /* Initialisation des descripteurs systeme par defaut */
   init_idt_dec(0x08, (t_uint32) handler_0, INT_GATE, &idt[0]);
   init_idt_dec(0x08, (t_uint32) handler_1, INT_GATE, &idt[1]);
@@ -36,12 +37,11 @@ void init_idt(void)
   init_idt_dec(0x08, (t_uint32) handler_12, INT_GATE, &idt[12]);
   init_idt_dec(0x08, (t_uint32) handler_13, INT_GATE, &idt[13]);
   init_idt_dec(0x08, (t_uint32) handler_14, INT_GATE, &idt[14]);
-  for (int i = 15; i < 250; ++i)
+  for (int i = 15; i < 32; ++i)
     init_idt_dec(0x08, (t_uint32) default_int, INT_GATE, &idt[i]);
 
 
-    init_idt_dec(0x08, (t_uint32) handler_timer, INT_GATE, &idt[64]); /* horloge */
-    unmask_master(1);
+    init_idt_dec(0x08, (t_uint32) isr_keyboard, INT_GATE, &idt[64]); /* horloge */
 
 //  init_idt_desc(0x08, (t_uint32) , INTGATE, &kidt[65]);	/* clavier */
 
@@ -49,4 +49,7 @@ void init_idt(void)
   idtr.base = (t_uint32) idt;
   idt_flush(&idtr);
   init_pic();
+  init_pit();
+  //mask_all_IRQ();
+  //unmask_master(0);
 }
