@@ -10,6 +10,8 @@ void default_int(void)
 void handler_0(void)
 {
     printf("%s", "Divide Error\r\n");
+    while (1)
+        ;
     int_ret();
 }
 

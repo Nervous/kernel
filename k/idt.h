@@ -26,6 +26,7 @@ void put_err_code();
 void int_ret();
 void int_ret_err();
 void init_pic();
+void pop_err_code();
 void unmask_master(t_uint8 pic);
 void unmask_slave(t_uint8 pic);
 

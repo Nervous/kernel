@@ -9,7 +9,7 @@ int_ret:
     iret
 
 .global int_ret_err
-int_ret:
+int_ret_err:
     pop %eax // Error code
     iret
 
