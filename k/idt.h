@@ -24,9 +24,9 @@ void init_idt();
 void idt_flush(struct idtr* idt_ptr);
 void put_err_code();
 void int_ret();
+void int_ret_err();
 void init_pic();
 void unmask_master(t_uint8 pic);
 void unmask_slave(t_uint8 pic);
-int get_err_code();
 
 #endif/* Descripteur de segment */

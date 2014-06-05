@@ -4,20 +4,14 @@ idt_flush:
     lidt (%eax)
     ret
 
-.global put_err_code
-put_err_code:
-    //push 0
-    ret
-
 .global int_ret
 int_ret:
-    //pop %eax // Error code
     iret
 
-.global get_err_code
-get_err_code:
-    pop %eax
-    ret
+.global int_ret_err
+int_ret:
+    pop %eax // Error code
+    iret
 
 .global init_pic
 init_pic:
