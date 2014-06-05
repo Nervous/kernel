@@ -1,14 +1,11 @@
 #ifndef CONSOLE_H
-# define CONSOLE_H
+  #define CONSOLE_H
 
-# include "kstd.h"
-
-typedef struct cons_attrs
+typedef struct
 {
-    int column;
-    int line;
-    char attrs;
-} s_cons_attrs;
+  int x_pos;
+  int y_pos;
+  unsigned char color;
+} console_info;
 
-
-#endif /* CONSOLE_H */
+#endif /* !CONSOLE_H */

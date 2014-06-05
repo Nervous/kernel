@@ -50,7 +50,7 @@ int send(int port, void* data, unsigned int len)
     return i;
 }
 
-int send_const(int port, const void* data, unsigned int len)
+int c_send(int port, const void* data, unsigned int len)
 {
     const t_uint8* dat = data;
     unsigned int i = 0;

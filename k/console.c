@@ -1,119 +1,140 @@
-#include "console.h"
-
 #include "kstd.h"
 #include "serial.h"
+#include "console.h"
 
-#define BUFFER_START    0xB8000
-#define BUFFER_END      0xBFD00 // 0xB8000 + 25 rows * 80 columns * 16 bits
+#define BEGIN_BUFF 0xB8000
 
-s_cons_attrs cons =
+console_info c_i = { 0, 0, 0x0F };
+
+typedef struct
 {
-    0,
-    0,
-    0x0F
-};
+  unsigned char charact;
+  unsigned char color;
+} s_cell;
 
-static void init_cons(void)
+
+void init_console(void)
 {
-    cons.attrs = 0x0F;
-    cons.line = 0;
-    cons.column = 0;
+  c_i.x_pos = 0;
+  c_i.y_pos = 0;
+  c_i.color = 0x0F;
 }
 
-static void clear_screen(void)
+void clear_screen(void)
 {
-    char* c = (void*) BUFFER_START;
-    for (int i = 0; i < (BUFFER_END - BUFFER_START) / 8; ++i)
-    {
-       c[i] = 0; 
-    }
-    init_cons();
+  char* buf = (void*)0xB8000;
+  c_i.x_pos = 0;
+  c_i.y_pos = 0;
+  for (int i = 0; i < 3999; i++)
+  {
+    buf[i] = 0;
+  }
+  init_console();
 }
 
-static void set_cons_color(const char color)
+void set_color(char color)
 {
-    cons.attrs = color;
+  c_i.color = color;
 }
 
-static char cons_putc(const char c)
+void set_x(char x)
 {
-    char* buf = (void*) BUFFER_START;
-    if (c == '\n')
+  if (x < 80)
+    c_i.x_pos = x;
+}
+
+void set_y(char y)
+{
+  if (y < 25)
+    c_i.y_pos = y;
+}
+
+char write_char(char c)
+{
+  if (c_i.x_pos + c_i.y_pos * 80 >= 2000)
+    return 0;
+  if (c == '\n')
+  {
+    c_i.y_pos++;
+    c_i.x_pos = 0;
+    return 0;
+  }
+  if (c == '\r')
+  {
+    c_i.x_pos = 0;
+    return 0;
+  }
+  if (c == '\t')
+  {
+    c_i.x_pos += 8;
+    c_i.y_pos = (c_i.x_pos) > 79 ? c_i.y_pos + 1 : c_i.y_pos;
+    c_i.x_pos = c_i.x_pos % 80;
+    return 0;
+  }
+  s_cell* buf = (void*)0xB8000;
+  buf[c_i.x_pos + c_i.y_pos * 80].color = c_i.color;
+  buf[c_i.x_pos + c_i.y_pos * 80].charact = c;
+  if (c_i.x_pos == 79)
+  {
+    c_i.x_pos = 0;
+    c_i.y_pos++;
+  }
+  else
+  {
+    c_i.x_pos++;
+  }
+  return 1;
+}
+
+int write_string(char* s, size_t length)
+{
+  for (size_t i = 0; i < length; i++)
+  {
+    if (!write_char(s[i]))
+      return i + 1;
+  }
+  return length;
+}
+
+int write(const char *buf, size_t count)
+{
+  const void* data = buf;
+  c_send(0x3f8, data, count);
+  int ret = 0;
+  for (size_t i = 0; i < count; i++)
+  {
+    if ((unsigned char)buf[i] == CONS_ESCAPE)
     {
-        ++cons.line;
-        cons.column = 0;
-        send_const(COM1, "\r\n", 2);
-    }
-    else
-    {
-        if (c == '\t')
+      if (i != count - 1)
+        switch (buf[i + 1])
         {
-            cons.column = cons.column < 71 ? cons.column + 8 : 0;
-            if (cons.column == 0)
-                ++(cons.line);
-        }
-        else if (c == '\r')
-            cons.column = 0;
-        else
-        {
-            buf[(cons.line * 80 + cons.column) * 2] = c;
-            buf[((cons.line * 80 + cons.column) * 2) + 1] = cons.attrs;
-            cons.column = cons.column < 79 ? cons.column + 1 : 0;
-            if (cons.column == 0)
-                ++(cons.line);
-        }
-
-        send_const(COM1, &c, 1);
-    }
-
-    return cons.line == 25;
-}
-
-static int get_attrs(const char* s, int remaining)
-{
-    int pos = 0;
-    if ((unsigned char) s[pos++] != CONS_ESCAPE)
-        return 0;
-    else if (remaining == 0) // Only a cons_escape, nothing else behind
-        return 1;
-    unsigned char act = s[pos];
-    if (act == CONS_CLEAR)
-    {
-        clear_screen();
-        return 2;
-    }
-    else if (act == CONS_COLOR && remaining >= 2)
-    {
-        set_cons_color(s[pos + 1]);
-        return 3;
-    }
-    else if (act == CONS_SETX && remaining >= 2)
-    {
-        cons.column = s[pos + 1];
-        return 3;
-    }
-    else if (act == CONS_SETY && remaining >= 2)
-    {
-        cons.line = s[pos + 1];
-        return 3;
-    }
-    else
-        return 1;
-}
-
-int write(const char* s, size_t length)
-{
-    int remove = 0;
-    for (unsigned int i = 0; i < length; ++i)
-    {
-        int move = get_attrs(s + i, length - i - 1);
-        remove += move;
-        i += move;
-        if (i >= length)
+          case CONS_CLEAR :
+            clear_screen();
+            i += 1;
             break;
-        if (cons_putc(s[i]) == 1)
-            return i;
+          case CONS_COLOR :
+            if (i < count - 2)
+              set_color(buf[i + 2]);
+            i += 2;
+            break;
+          case CONS_SETX :
+            if (i < count - 2)
+              set_x(buf[i + 2]);
+            break;
+          case CONS_SETY :
+            if (i < count - 2)
+              set_y(buf[i + 2]);
+            break;
+          default:
+            i++;
+            break;
+        }
     }
-
-    return length - remove;
+    else
+    {
+      write_char(buf[i]);
+      ret++;
+    }
+  }
+  return ret;
 }
