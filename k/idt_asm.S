@@ -6,12 +6,13 @@ idt_flush:
     ret
 
 isr:
-    pop %eax
+    xchgl %eax, (%esp)
     pusha
     call *%eax
     mov $0x20, %al
     outb %al, $0x20
     popa
+    pop %eax
     iret
 
 .global isr_keyboard
