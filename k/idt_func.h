@@ -18,5 +18,6 @@ void handler_12(void);
 void handler_13(void);
 void handler_14(void);
 void handler_timer(void);
+void keyboard_handler(void);
 
 #endif

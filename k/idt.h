@@ -30,6 +30,7 @@ void init_pic();
 void init_pit();
 void unmask_master(t_uint8 pic);
 void unmask_slave(t_uint8 pic);
+void isr_timer();
 void isr_keyboard();
 void mask_all_IRQ();
 

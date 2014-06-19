@@ -41,7 +41,6 @@ void	k_main(unsigned long		magic,
         printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
         while(1)
         {
-            printf("%d\r", gettick());
         }
     }
 

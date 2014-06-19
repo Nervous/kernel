@@ -15,9 +15,14 @@ isr:
     pop %eax
     iret
 
+.global isr_timer
+isr_timer:
+    pushl $handler_timer
+    jmp isr
+
 .global isr_keyboard
 isr_keyboard:
-    pushl $handler_timer
+    pushl $keyboard_handler
     jmp isr
 
 .global init_pic

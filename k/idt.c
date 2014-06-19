@@ -39,9 +39,9 @@ void init_idt(void)
   init_idt_dec(0x08, (t_uint32) handler_14, INT_GATE, &idt[14]);
 
 
-    init_idt_dec(0x08, (t_uint32) isr_keyboard, INT_GATE, &idt[64]); /* horloge */
+    init_idt_dec(0x08, (t_uint32) isr_timer, INT_GATE, &idt[64]); /* horloge */
 
-//  init_idt_desc(0x08, (t_uint32) , INTGATE, &kidt[65]);	/* clavier */
+    init_idt_dec(0x08, (t_uint32) isr_keyboard, INT_GATE, &idt[65]);	/* clavier */
 
   idtr.limite = 255 * 8 - 1;
   idtr.base = (t_uint32) idt;

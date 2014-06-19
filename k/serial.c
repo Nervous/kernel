@@ -46,7 +46,6 @@ int send(int port, void* data, unsigned int len)
         }
         outb(port, dat[i]);
     }
-
     return i;
 }
 
