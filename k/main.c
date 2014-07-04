@@ -27,6 +27,8 @@
 #include "serial.h"
 #include "gdt.h"
 
+#include "kfs.h"
+
 #include "timer.h"
 
 void	k_main(unsigned long		magic,
@@ -38,7 +40,19 @@ void	k_main(unsigned long		magic,
         set_gdt();
         init_uart();
         init_idt();
+        int kfs = init_kfs(info);
         printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
+        if (kfs != 0)
+        {
+            printf("Failed to init KFS.");
+            while (1)
+                ;
+        }
+        int ret = open("test.txt", O_RDONLY);
+        char str[256] = {'\0'};
+
+        read(ret, str, 256);
+        printf("%s\n", str);
         while(1)
         {
         }
