@@ -48,11 +48,11 @@ void	k_main(unsigned long		magic,
             while (1)
                 ;
         }
-        int ret = open("test.txt", O_RDONLY);
+        /*int ret = open("test.txt", O_RDONLY);
         char str[256] = {'\0'};
 
         read(ret, str, 256);
-        printf("%s\n", str);
+        printf("%s\n", str); // KFS TESTING */
         while(1)
         {
         }
