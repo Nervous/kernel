@@ -43,6 +43,8 @@ void init_idt(void)
 
     init_idt_dec(0x08, (t_uint32) isr_keyboard, INT_GATE, &idt[65]);	/* clavier */
 
+    init_idt_dec(0x08, (t_uint32) isr_syscall, INT_GATE, &idt[128]);	/* syscall */
+
   idtr.limite = 255 * 8 - 1;
   idtr.base = (t_uint32) idt;
   idt_flush(&idtr);

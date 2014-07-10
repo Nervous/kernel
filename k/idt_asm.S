@@ -25,6 +25,24 @@ isr_keyboard:
     pushl $keyboard_handler
     jmp isr
 
+.global isr_syscall
+isr_syscall:
+    pusha
+    push %edx
+    push %ecx
+    push %ebx
+    pushl $handler_syscall
+    xchgl %eax, (%esp)
+    call *%eax
+    pop %eax
+    pop %ebx
+    pop %ecx
+    pop %edx
+    mov $0x20, %al
+    outb %al, $0x20
+    popa
+    iret
+
 .global init_pic
 init_pic:
     mov $0x11, %al
@@ -101,3 +119,10 @@ send_EOI_slave:
 mask_all_IRQ:
     mov $0xFF, %al
     outb %al, $0x21
+
+.global test_syscall
+test_syscall:
+    mov $0x01, %eax
+    mov 0x4(%esp), %ebx
+    mov 0x8(%esp), %ecx
+    int $0x80

@@ -32,6 +32,7 @@ void unmask_master(t_uint8 pic);
 void unmask_slave(t_uint8 pic);
 void isr_timer();
 void isr_keyboard();
+void isr_syscall();
 void mask_all_IRQ();
 
 #endif/* Descripteur de segment */

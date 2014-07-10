@@ -23,7 +23,8 @@ void keyboard_handler(void)
   i = inb(0x60);
   i--;
 
-  if (i < 0x80) {		/* touche enfoncee */
+  if (i < 0x80) 
+  { 
     switch (i) {
       case 0x29:
         lshift_enable = 1;
@@ -34,7 +35,9 @@ void keyboard_handler(void)
       default:
         write((const char *)&kbdmap[i * 4 + (lshift_enable || rshift_enable)], 1);
     }
-  } else {		/* touche relachee */
+  } 
+  else 
+  {
     i -= 0x80;
     switch (i) {
       case 0x29:

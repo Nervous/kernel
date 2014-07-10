@@ -31,6 +31,10 @@
 
 #include "timer.h"
 
+void test_syscall(char *buf, size_t count);
+
+char test[4];
+
 void	k_main(unsigned long		magic,
 	       multiboot_info_t*	info)
 {
@@ -53,6 +57,12 @@ void	k_main(unsigned long		magic,
 
         read(ret, str, 256);
         printf("%s\n", str); // KFS TESTING */
+        test[0] = 't';
+        test[1] = 'e';
+        test[2] = 's';
+        test[3] = 't';
+        printf("%c%c", CONS_ESCAPE, CONS_CLEAR);
+        test_syscall(test, 4);
         while(1)
         {
         }
