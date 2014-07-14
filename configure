@@ -52,7 +52,7 @@ MOUNT	= mount
 UMOUNT	= umount
 MNT	= /mnt
 
-CFLAGS	= -Wall -Wextra -Werror -nostdinc -fno-builtin -g3 -gdwarf-2 -m32
+CFLAGS	= -Wall -Wextra -nostdinc -fno-builtin -g3 -gdwarf-2 -m32
 # SSP causes compilation problems on Ubuntu
 CFLAGS	+= -fno-stack-protector -std=c99
 LDFLAGS	= -nostdlib -m32 $FLAGS_BUILDID

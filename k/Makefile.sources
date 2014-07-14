@@ -1,2 +1,2 @@
-SRC	= main.c console.c serial.c gdt.c idt.c idt_func.c timer.c kb.c syscall.c kfs.c
+SRC	= main.c console.c serial.c gdt.c idt.c idt_func.c timer.c kb.c syscall.c kfs.c vgadriver.c  libvga.c
 ASM	= crt0.S gdt_asm.S idt_asm.S
