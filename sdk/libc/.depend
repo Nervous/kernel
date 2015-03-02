@@ -1,0 +1,3 @@
+stdio.o: stdio.c stdio.h stdlib.h stddef.h kstd.h stdarg.h
+stdlib.o: stdlib.c stdlib.h stddef.h kstd.h
+string.o: string.c string.h stdlib.h stddef.h kstd.h

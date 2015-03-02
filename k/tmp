@@ -1,0 +1,6 @@
+set_entry (u32 base, u16 limit, u8 type)
+{
+struct machin
+machin.limit = limit;
+machin.baselow = base 
+}

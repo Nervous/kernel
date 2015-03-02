@@ -1,0 +1,10 @@
+graphic.o: graphic.c libk.h ../libc/kstd.h graphic.h ../libc/stddef.h \
+ ../libc/string.h ../libc/stdlib.h ../libc/stdio.h ../libc/stdarg.h \
+ sound.h
+malloc.o: malloc.c ../libc/kstd.h ../libc/string.h ../libc/stdlib.h \
+ ../libc/stddef.h
+sound.o: sound.c libk.h ../libc/kstd.h graphic.h ../libc/stddef.h \
+ ../libc/string.h ../libc/stdlib.h ../libc/stdio.h ../libc/stdarg.h \
+ sound.h
+syscalls.o: syscalls.c ../libc/kstd.h ../libc/stddef.h
+int80.o: int80.S
