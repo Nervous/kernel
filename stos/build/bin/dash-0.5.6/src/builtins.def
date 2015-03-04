@@ -1,0 +1,44 @@
+# 1 "/home/green/EPITA/Kernel/TP/stos-student/bin/dash-0.5.6/src/builtins.def.in"
+# 1 "/home/green/EPITA/Kernel/TP/stos-student/build//"
+# 1 "<command-line>"
+# 1 "/home/green/EPITA/Kernel/TP/stos-student/bin/dash-0.5.6//config.h" 1
+# 1 "<command-line>" 2
+# 1 "/home/green/EPITA/Kernel/TP/stos-student/bin/dash-0.5.6/src/builtins.def.in"
+# 61 "/home/green/EPITA/Kernel/TP/stos-student/bin/dash-0.5.6/src/builtins.def.in"
+breakcmd -s break -s continue
+cdcmd -u cd chdir
+commandcmd -u command
+dotcmd -s .
+echocmd echo
+evalcmd -ns eval
+execcmd -s exec
+exitcmd -s exit
+exportcmd -as export -as readonly
+falsecmd -u false
+getoptscmd -u getopts
+hashcmd hash
+jobscmd -u jobs
+localcmd -a local
+printfcmd printf
+pwdcmd pwd
+readcmd -u read
+returncmd -s return
+setcmd -s set
+shiftcmd -s shift
+
+
+
+trapcmd -s trap
+truecmd -s : -u true
+typecmd type
+
+
+
+unaliascmd -u unalias
+unsetcmd -s unset
+waitcmd -u wait
+aliascmd -au alias
+
+
+
+testcmd test [

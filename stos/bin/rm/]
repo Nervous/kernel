@@ -1,0 +1,29 @@
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+static inline int error(char* filename)
+{
+	fprintf(stderr, "rm: %s: %s\n", filename, strerror(errno));
+	return errno;
+}
+
+int main(int argc, char* argv[])
+{
+	if (argc < 2) {
+		fprintf(stderr, "rm: missing operand\n");
+		return 1;
+	}
+
+	int i;
+	int ret = 0;
+	for (i = 1; i < argc && argv[i] != NULL; i += 1) {
+		if (unlink(argv[i]) < 0) {
+			error(argv[i]);
+			ret = errno;
+		}
+	}
+
+	return ret;
+}

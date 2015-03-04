@@ -1,0 +1,6 @@
+void handler_syscall()
+{
+    __asm__ volatile("inb %1, %0\n\t"
+                     : "=&a" (b)
+                     : "d" ((t_uint16) port));
+}

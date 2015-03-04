@@ -1,0 +1,174 @@
+#!/bin/sh
+
+STOS_ARCH="`uname -m`"
+SRCDIR=${0%%configure}
+
+if [ $SRCDIR = "./" ]; then
+	echo "Out of tree builds are recommended"
+fi
+
+realpath()
+{
+  cd "$1"
+  echo "$PWD/"
+  cd - >/dev/null
+}
+
+SRCDIR=$(realpath $SRCDIR)
+
+usage()
+{
+	echo "Script options:"
+	echo "	--help			: show this usage"
+	echo "	--arch=ARCH		: set the compilation architecture to ARCH"
+	echo "	--mach=MACH		: set the target machine to MACH"
+	echo "	--with-debug		: enable debug flags"
+	echo "	--with-klog-serial	: enable serial line for klog (COM1)"
+	echo ""
+	echo "Additional environment variable that may affect compilation:"
+	echo "	CC			: C compiler"
+	echo "  PREFIX			: the prefix for the tools"
+	echo "	CFLAGS			: default C compiler flags"
+	echo "	ASFLAGS			: default assembler flags"
+	echo "	LDFLAGS			: default linker flags"
+}
+
+STOS_ARCH="i386"
+
+for i; do
+	case $i in
+		"--help")
+			usage
+			exit 0
+			;;
+		"--arch="*)
+			STOS_ARCH="${i##--arch=}"
+			;;
+		"--mach="*)
+			STOS_MACH="${i##--mach=}"
+			;;
+		"--with-debug")
+			CFLAGS="$CFLAGS -g"
+			;;
+		"--with-klog-serial")
+			CFLAGS="$CFLAGS -DEARLY_KLOG_SERIAL -DEARLY_KLOG_SERIAL_PORT=0x3f8"
+			;;
+	esac
+done
+
+case $STOS_ARCH in
+	i*86)
+		STOS_ARCH="i386"
+		: ${STOS_MACH:="pc"}
+		;;
+	powerpc|ppc)
+		STOS_ARCH="powerpc"
+		: ${STOS_MACH:="ofw"}
+		;;
+	sparc|sparc64)
+		STOS_ARCH="sparc64"
+		: ${STOS_MACH:="ofw"}
+		;;
+esac
+
+if [ -z "$CC" ]; then
+	CC="${PREFIX}gcc"
+
+	if [ "`uname -m`" = "x86_64" -a "${STOS_ARCH}" = "i386" ]; then
+		CC="${CC} -m32"
+	fi
+fi
+
+echo -n "Checking toolchain..."
+echo "int _start() { return 0; } " | $CC $CFLAGS -x c -nostdlib -o /dev/null - 2> /dev/null
+if [ $? -ne 0 ]; then
+	echo "Fail"
+	echo "C compiler not found, or not working, please run tools/build-toolchain.sh"
+	exit 1
+fi
+echo "OK"
+
+echo -n "Checking sfdisk..."
+sfdisk > /dev/null 2> /dev/null
+if [ $? -eq 127 ]; then
+	echo "Fail"
+	echo "sfdisk not found, please install it"
+	exit 1
+fi
+echo "OK"
+
+echo -n "Checking genext2fs..."
+genext2fs -V > /dev/null 2> /dev/null
+if [ $? -ne 0 ]; then
+	echo "Fail"
+	echo "genext2fs not found, please install it"
+	exit 1
+fi
+echo "OK"
+
+echo -n "Installing stos-config..."
+cp ${SRCDIR}/kernel/core/arch/${STOS_ARCH}/default.config stos-config
+echo "OK"
+
+if [ -d "$SRCDIR/.git" ] && which git >/dev/null 2>&1; then
+	git_vers=$(git --git-dir "$SRCDIR/.git" rev-parse --short HEAD)
+	STOS_GIT_HEAD=$git_vers
+else
+    STOS_GIT_HEAD="unknown"
+fi
+
+OBJCOPY="${PREFIX}objcopy"
+AR="${PREFIX}ar"
+STRIP="${PREFIX}strip"
+
+cat <<EOF > Makefile
+ifeq (\$(MAKELEVEL),0)
+# Make is quite dumb, -rR options in MAKEFLAGS are only examined
+# *before* parsing any Makefile, thus, we need to do a recursive make in
+# order to enable those flags.
+MAKEFLAGS	:= -rR --warn-undefined-variables --no-print-directory
+ifeq ("\$(origin V)", "undefined")
+	V := 0
+endif
+ifneq (\$V, 1)
+	MAKEFLAGS += -s
+endif
+export MAKEFLAGS
+
+all:
+
+%:
+	\$(MAKE) -C . \$@
+else
+STOS_ARCH	:= $STOS_ARCH
+STOS_MACH	:= $STOS_MACH
+STOS_GIT_HEAD	:= $STOS_GIT_HEAD
+
+HOST_CC		:= gcc
+HOST_LD		:= gcc
+HOST_AR		:= ar
+
+HOST_CFLAGS	:=
+HOST_ASFLAGS	:=
+
+CC		:= $CC
+LD		:= $CC
+AR		:= $AR
+OBJCOPY		:= $OBJCOPY
+STRIP		:= $STRIP
+DEFAULT_CFLAGS	:= $CFLAGS
+DEFAULT_ASFLAGS	:= -D__ASSEMBLY__ $ASFLAGS
+DEFAULT_LDFLAGS	:= -nostdlib -Wl,--build-id=none $LDFLAGS
+O		:= $SRCDIR
+VPATH		:= $SRCDIR
+
+include ${SRCDIR}Makefile.stos
+
+Makefile: ${SRCDIR}configure
+	CC="$CC" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" ASFLAGS="$ASFLAGS" \\
+	${SRCDIR}configure --arch=$STOS_ARCH --mach=$STOS_MACH
+
+\$(DEPS:.d=.o): Makefile
+endif
+
+EOF
