@@ -1,0 +1,14 @@
+default 0
+timeout 0
+title stos
+root (hd0,0)
+kernel /boot/stos.grub init.mode=all
+module /kernel/stos
+module /kernel/initramfs.img
+module /kernel/modules/commandline.ko
+module /kernel/modules/first_fit_kmalloc.ko
+module /kernel/modules/frame_allocator.ko
+module /kernel/modules/libraries.ko
+module /kernel/modules/test.ko
+module /kernel/modules/hello.ko
+module /kernel/modules/init.ko
