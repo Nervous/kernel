@@ -2,6 +2,7 @@
 #include <kernel/module.h>
 #include <kernel/klog.h>
 #include <kernel/stos.h>
+#include <kernel/string.h>
 
 static void init(void);
 
@@ -18,15 +19,19 @@ struct gdtentry {
 	u8 l : 1;
 	u8 db : 1;
 	u8 g : 1;
-	u16 basehigh;
+	u8 basehigh;
 } __attribute__((__packed__));
 typedef struct gdtentry s_gdt_entry;
 
 struct gdtr {
 	u16 limit;
 	u32 base;
-}; typedef struct gdtr s_gdtr;
+} __attribute__((__packed__));
+typedef struct gdtr s_gdtr;
 
+void flush_gdt(s_gdtr* gdtr);
+void set_pe_flag();
+void reload_segs();
 struct access {
 	u8 type : 4;
 	u8 s :1;
@@ -60,24 +65,11 @@ int set_gdt_gate(u32 base, u32 limit, u8 access, u8 tgranularity, int n)
 	tmp_entry.p = 1;
 	tmp_entry.limithigh = (limit >> 16) & 0xF;
 	tmp_entry.avl = 1;
-	tmp_entry.l = 0;
 	tmp_entry.db = tmp_granularity->db;
 	tmp_entry.g = tmp_granularity->g;
 	tmp_entry.basehigh = (base >> 24) & 0xFF;
 	gdt[n] = tmp_entry;
-	return 0;
-}
-
-static void flush_gdt(s_gdtr* gdtr)
-{
-/*	asm("movl %1, outb\n\t movl outb, %%eax\n\tlgdt(%%eax)\n\tret"
-			: "=r" (gdtr)
-			: "r" (gdtr));*/
-}
-
-static void set_pe_flag()
-{
-	__asm("movl %cr0, %eax\nor $1, %al\nmovl %eax, %cr0\nret");
+	return 1;
 }
 
 static void reload_segments()
@@ -92,16 +84,18 @@ static void reload_segments()
 
 static void __init_once init(void)
 {
+	klog("gdt demarrage..");
 	memset(gdt, 0, sizeof(s_gdt_entry) * 5);
-	set_gdt_date(0, 0xFFFFFFFF, CODE_SEGMENT(0), GRANULARITY_4K|GRANULARITY_32bit, 1);
-	set_gdt_date(0, 0xFFFFFFFF, DATA_SEGMENT(0), GRANULARITY_4K|GRANULARITY_32bit, 2);
-	set_gdt_date(0, 0xFFFFFFFF, CODE_SEGMENT(3), GRANULARITY_4K|GRANULARITY_32bit, 3);
-	set_gdt_date(0, 0xFFFFFFFF, DATA_SEGMENT(3), GRANULARITY_4K|GRANULARITY_32bit, 4);
+	set_gdt_gate(0, 0xFFFFFFFF, CODE_SEGMENT(0), GRANULARITY_4K|GRANULARITY_32bit, 1);
+	set_gdt_gate(0, 0xFFFFFFFF, DATA_SEGMENT(0), GRANULARITY_4K|GRANULARITY_32bit, 2);
+	set_gdt_gate(0, 0xFFFFFFFF, CODE_SEGMENT(3), GRANULARITY_4K|GRANULARITY_32bit, 3);
+	set_gdt_gate(0, 0xFFFFFFFF, DATA_SEGMENT(3), GRANULARITY_4K|GRANULARITY_32bit, 4);
 	gdtr.base = (u32) gdt;
 	gdtr.limit = sizeof(s_gdt_entry) * 5 - 1;
 	flush_gdt(&gdtr);
 	set_pe_flag();
-	reload_segments();
+	reload_segs();
+	//reload_segments();
 	klog("gdt init");
 }
 
