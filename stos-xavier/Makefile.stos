@@ -1,0 +1,65 @@
+STOS_MAJOR		:= 1
+STOS_MINOR		:= 0
+
+STOS_TARGET		:= $(STOS_ARCH)-$(STOS_MACH)
+
+CUR_DIR			:=
+SUBDIRS			:= lib/ kernel/ bootloader/$(STOS_TARGET)/ bin/
+
+ALL_PROGS		:=
+ALL_LIBS		:=
+DEPS			:=
+MODULES_INSTALL		:=
+PROG_INSTALL		:=
+BOOTFILES		:=
+
+USER_CFLAGS		:= -I$Oinclude -I$Okernel/include -Iinclude -D__USERLAND__ -ffreestanding
+USER_ASFLAGS		:= $(USER_CFLAGS)
+
+.PHONY: all boot
+all: stos-$(STOS_TARGET).boot
+
+boot: stos-$(STOS_TARGET).boot bootable
+	$(QEMU) $(QEMU_FLAGS) $<
+
+-include stos-config
+include $Omk/subdirs.mk
+
+include/kernel/arch:
+	$(call run,RM,rm -f $@)
+	$(call run,MKDIR,mkdir -p include/kernel/)
+	$(call run,LN,ln -sf $Okernel/include/kernel/$(STOS_ARCH) $@)
+
+rootfs.img: $(MODULES_INSTALL) $(BOOTFILES) $(PROG_INSTALL) initramfs.img
+	$(call run,MKROOTFS,genext2fs -b 10000 -d root -q rootfs.img)
+
+initramfs.img: root/
+	$(call run,MKINITRAMFS,cd initramfs; find . -print0 | cpio -R 0:0 -0 -o -H newc --quiet > ../$@)
+	$(call run,CPINITRAMFS,cp initramfs.img root/kernel/)
+
+.PHONY: clean distclean
+clean:
+	$(call run,CLEAN,)
+	rm -f $(DEPS:.d=.o)
+	rm -f $(MODULES)
+
+distclean: clean
+	$(call run,DISTCLEAN,)
+	rm -f $(ALL_PROGS)
+	rm -f $(ALL_LIBS)
+	rm -f $(DEPS)
+	rm -f $(BOOTFILES)
+	rm -f $(MODULES_INSTALL)
+	rm -f $(PROG_INSTALL)
+	rm -f $(ALL_LIBS)
+	rm -f include/kernel/arch
+	rm -f userland/kernel/include/arch
+	rm -f initramfs.img
+	rm -f rootfs.img
+
+-include $(DEPS)
+
+include $Omk/run.mk
+include $Omk/rules.mk
+include $Omk/rootdirs.mk
+include $Omk/initramfs.mk
